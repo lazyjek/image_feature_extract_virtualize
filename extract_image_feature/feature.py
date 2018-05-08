@@ -8,6 +8,7 @@ import os
 import time
 from inception_resnet_v2 import inception_resnet_v2_arg_scope,inception_resnet_v2
 import PIL.Image as Image
+import glob
 
 class ImageFeature(object):
     def __init__(self, image_feature_dir = 'features',

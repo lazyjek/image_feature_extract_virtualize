@@ -12,16 +12,24 @@ cluster_batch=200
 cluster_res='output/cluster.res'
 #process=("Feature ClusterTrain Cluster")
 process=("Cluster")
+process=("Feature")
 
 if [ ! -e inception_resnet_v2_2016_08_30.ckpt ]; then
     wget http://download.tensorflow.org/models/inception_resnet_v2_2016_08_30.tar.gz
     tar -zxvf inception_resnet_v2_2016_08_30.tar.gz
     if [ $? -ne 0 ]; then
-        echo "wget ERROR!"
+        echo "wget checkpoint ERROR!"
         exit
     fi
 fi
-exit 0
+
+if [ ! -e inception_resnet_v2.py ]; then
+    wget https://github.com/cameronfabbri/Compute-Features/blob/master/nets/inception_resnet_v2.py
+    if [ $? -ne 0 ]; then
+        echo "wget model parser ERROR!"
+        exit
+    fi
+fi
 
 for proc in ${process[@]}; do
     if [ $proc"x" == "Featurex" ]; then
