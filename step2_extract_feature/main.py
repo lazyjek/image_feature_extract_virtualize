@@ -2,7 +2,8 @@
 from feature import ImageFeature
 from cluster import ImageKMeans
 import argparse
-import os
+import os,sys
+import multiprocessing
 
 def run_cluster(train=False, # whether to train or cluster
         inputs = 'features', # pkl directory / file / fnmatch

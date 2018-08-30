@@ -1,6 +1,11 @@
 # -*- coding:utf-8 -*-
+"""
+File: virtualize.py
+Author: qixiucao
+Email: jennifer.cao@wisc.edu
+"""
 import PIL.Image as Image
-import os, sys
+import os
 import multiprocessing
 
 def _virtualize_image(save_path='test.jpg', image_paths = [],

@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+File: cluster.py
+Author: qixiucao
+Email: jennifer.cao@wisc.edu
+"""
 import _pickle as pickle
 import glob
 import tensorflow as tf
@@ -20,11 +25,6 @@ class ImageKMeans(KMeans):
             kmeans_plus_plus_num_retries = 5,
             random_seed = 0):
 
-        """ KMeans Cluster For Image Feature
-        Args:
-            inputs: pickle directory
-            model_path: checkpoint file
-            """
         # initialize kmeans model path.
         self.model_path = model_path
         try: os.makedirs('/'.join(model_path.split("/")[:-1]))
@@ -40,11 +40,13 @@ class ImageKMeans(KMeans):
         def init_inputs(inputs=inputs):
             feat_dict = {}
             if inputs.endswith('.pkl'):
+                print ("pklfile is: {}".format(inputs))
                 try: feat_dict.update(pickle.load(open(inputs, 'rb')))
                 except: print ('load_image_feature[%s] must provide ABSOLUTE PATH!'%inputs); exit()
             elif '*' in inputs:
                 pklpaths = [ f for f in glob.iglob(inputs) if fnmatch.fnmatch(f, '*.pkl')]
                 for p in pklpaths:
+                    print ("pklfile is: {}".format(p))
                     try:feat_dict.update(pickle.load(open(p, 'rb')))
                     except: print ('load_image_feature[%s] EMPTY'%inputs); exit()
             else:
@@ -52,6 +54,7 @@ class ImageKMeans(KMeans):
                         for d,_,fList in os.walk(inputs) \
                         for filename in fList if fnmatch.fnmatch(filename, '*.pkl')]
                 for p in pklpaths:
+                    print ("pklfile is: {}".format(p))
                     try:feat_dict.update(pickle.load(open(p, 'rb')))
                     except: print ('load_image_feature[%s] EMPTY'%inputs); exit()
             items = feat_dict.items()
@@ -68,13 +71,11 @@ class ImageKMeans(KMeans):
 
     def training_graph(self):
       """Generate a training graph for kmeans algorithm.
-       This function is inheritted from KMeans.
       """
       # Implementation of kmeans.
       if (isinstance(self._initial_clusters, str) or
           callable(self._initial_clusters)):
         initial_clusters = self._initial_clusters
-        # changed line.
         num_clusters = ops.convert_to_tensor(self._num_clusters)
       else:
         initial_clusters = ops.convert_to_tensor(self._initial_clusters)
@@ -121,10 +122,7 @@ class ImageKMeans(KMeans):
             random_seed = 0,
             kmeans_plus_plus_num_retries = 5,
             kmc2_chain_length = 200):
-        """initialize parameters and session for kmeans
-        Noted: this is an inner function, and should not be used outside of this class
-        Args to be NOTED:
-            initial_clusters: it should be kmeans_plus_plus or a tensor"""
+
         # load saved cluster centers.
         if self.outputs != None:
             saver = tf.train.import_meta_graph(self.model_path + '.meta')
@@ -155,7 +153,6 @@ class ImageKMeans(KMeans):
         self.kmeans_session.run(init_op, feed_dict={self.kmeans_x:self.inputs})
 
     def save_kmeans_model(self, num_steps=1000, observe_steps = 10):
-        """This is an interface for training and saving a k-means model """
         for i in range(1, num_steps + 1):
             _, d, idx, s = self.kmeans_session.run(self.fetch_kmeans, feed_dict={self.kmeans_x: self.inputs})
             if i == 1:
@@ -175,9 +172,6 @@ class ImageKMeans(KMeans):
         saver.save(self.kmeans_session, self.model_path)
 
     def cluster(self, batch=100):
-        """This is an interface for clustering data based on an existed k-means model
-        Args:
-            batch: batch_size for clustering data. """
         inputsL = [self.inputs[i:i+batch] for i in range(0,self.inputs.shape[0],batch)]
         image_namesL = [self.image_names[i:i+batch] for i in range(0,len(self.image_names),batch)]
         try: os.makedirs('/'.join(self.outputs.split('/')[:-1]))

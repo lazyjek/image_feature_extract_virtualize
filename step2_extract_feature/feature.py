@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
+"""
+File: feature.py
+Author: qixiucao
+Email: jennifer.cao@wisc.edu
+"""
 import scipy.misc as misc
 import _pickle as pickle
 import tensorflow as tf
 import numpy as np
 import fnmatch
 import os
+import glob
 import time
 from inception_resnet_v2 import inception_resnet_v2_arg_scope,inception_resnet_v2
 import PIL.Image as Image
-import glob
 
 class ImageFeature(object):
     def __init__(self, image_feature_dir = 'features',
@@ -111,11 +116,15 @@ class ImageFeature(object):
             print ('TIME for initialize image matrix from local paths: %.2f s'%(end - start))
             start = end
 
-        feat_dict.update({
-            paths[i]:self.extract_image_session.run(self.image_features, feed_dict={self.extract_image_x:img})[i] \
-                    for paths, img in images \
-                    for i in range(len(paths))
-            })
+        for paths, img in images:
+           feat = self.extract_image_session.run(self.image_features, feed_dict={self.extract_image_x:img})
+           feat_dict.update({paths[i]:feat[i] for i in range(len(paths))})
+
+#        feat_dict = {
+#            paths[i]:self.extract_image_session.run(self.image_features, feed_dict={self.extract_image_x:img})[i] \
+#                    for paths, img in images \
+#                    for i in range(len(paths))
+#            }
 
         if monitor == True:
             end = time.time()

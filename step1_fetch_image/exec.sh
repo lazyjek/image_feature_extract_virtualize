@@ -4,7 +4,7 @@ image_url_dir='url/data'
 image_file_dir='images'
 image_zip_dir='compress'
 threads=16
-process=("Spider Tar")
+process=("Spider")
 
 if [ $# -eq 2 ]; then
     source $1
